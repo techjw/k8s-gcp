@@ -1,0 +1,15 @@
+imports:
+  - path: infra.jinja
+  - path: masters.jinja
+  - path: workers.jinja
+  - path: ingress.jinja
+
+resources:
+  - name: infra
+    type: infra.jinja
+  - name: masters
+    type: masters.jinja
+  - name: workers
+    type: workers.jinja
+  - name: ingress
+    type: ingress.jinja

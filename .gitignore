@@ -1,0 +1,8 @@
+kismatic/generated
+kismatic/ansible
+kismatic/runs
+kismatic/kismatic
+kismatic/kubectl
+kismatic/helm
+kismatic/provision
+kismatic/*.tar.gz

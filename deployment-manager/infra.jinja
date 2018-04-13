@@ -1,0 +1,51 @@
+resources:
+  - type: compute.v1.network
+    name: {{ env["deployment"] }}-network
+    properties:
+      autoCreateSubnetworks: false
+
+  - type: compute.v1.subnetwork
+    name: {{ env["deployment"] }}-subnet
+    properties:
+      network: $(ref.{{ env["deployment"] }}-network.selfLink)
+      region: {{ properties["region"] }}
+      ipCidrRange: {{ properties["subnet_cidr"] }}
+
+  - type: compute.v1.firewall
+    name: {{ env["deployment"] }}-network-allow-ssh
+    properties:
+      network: $(ref.{{ env["deployment"] }}-network.selfLink)
+      direction: INGRESS
+      priority: 9000
+      allowed:
+        - IPProtocol: tcp
+          ports: [22]
+      sourceRanges:
+        - {{ properties["local_cidr"] }}
+
+  - type: compute.v1.firewall
+    name: {{ env["deployment"] }}-network-allow-internal
+    properties:
+      network: $(ref.{{ env["deployment"] }}-network.selfLink)
+      direction: INGRESS
+      priority: 9000
+      allowed:
+        - IPProtocol: tcp
+          ports: [0-65535]
+        - IPProtocol: udp
+          ports: [0-65535]
+        - IPProtocol: icmp
+      sourceRanges:
+        - {{ properties["subnet_cidr"] }}
+
+  - type: compute.v1.firewall
+    name: {{ env["deployment"] }}-network-allow-kubeapi
+    properties:
+      network: $(ref.{{ env["deployment"] }}-network.selfLink)
+      direction: INGRESS
+      priority: 1000
+      allowed:
+        - IPProtocol: tcp
+          ports: [6443]
+      sourceRanges:
+        - {{ properties["local_cidr"] }}

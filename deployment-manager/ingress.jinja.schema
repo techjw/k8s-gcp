@@ -1,0 +1,31 @@
+info:
+  title: Kubernetes cluster ingress nodes via KET
+  author: James Walton, Apprenda
+  description: Create VMs for Kubernetes ingress worker nodes
+
+required:
+  - region
+  - zone
+  - machineType
+
+properties:
+  region:
+    description: Region for subnet(s)
+    type: string
+    default: us-east4
+  zone:
+    description: Zone for ingress instances
+    type: string
+    default: us-east4-c
+  machineType:
+    description: VM machine type
+    type: string
+    default: n1-standard-2
+  instances:
+    description: Number of ingress VMs
+    type: integer
+    default: 1
+  diskSizeGb:
+    description: Size of boot disk
+    type: integer
+    default: 10

@@ -1,0 +1,63 @@
+resources:
+  - type: compute.v1.instanceGroup
+    name: {{ env["deployment"] }}-masters-ig
+    properties:
+      region: {{ properties["region"] }}
+      zone: {{ properties["zone"] }}
+      network: $(ref.{{ env["deployment"] }}-network.selfLink)
+      namedPorts:
+        - name: kubeapi
+          port: 6443
+
+{% for k in range(1,properties["instances"]+1) %}
+  - type: compute.v1.instance
+    name: {{ env["deployment"] }}-master-{{ k }}
+    properties:
+      zone: {{ properties["zone"] }}
+      machineType: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/zones/{{ properties["zone"] }}/machineTypes/{{ properties["machineType"] }}
+      networkInterfaces:
+        - network: $(ref.{{ env["deployment"] }}-network.selfLink)
+          subnetwork: $(ref.{{ env["deployment"] }}-subnet.selfLink)
+          accessConfigs:
+            - name: {{ env["deployment"] }}-master-{{ k }}-eth0
+              type: ONE_TO_ONE_NAT
+      disks:
+        - deviceName: boot
+          type: PERSISTENT
+          boot: true
+          autoDelete: true
+          initializeParams:
+            diskName: {{ env["deployment"] }}-master-{{ k }}-boot
+            diskType: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/zones/{{ properties["zone"] }}/diskTypes/pd-ssd
+            diskSizeGb: {{ properties["diskSizeGb"] }}
+            sourceImage: https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/ubuntu-1604-xenial-v20180405
+      tags:
+        items:
+          - kubeapi
+{% endfor %}
+
+  - type: compute.v1.targetPool
+    name: {{ env["deployment"] }}-api-tpool
+    properties:
+      region: {{ properties["region"] }}
+      portName: kubeapi
+      instances:
+      {% for k in range(1,properties["instances"]+1) %}
+        - $(ref.{{ env["deployment"] }}-master-{{ k }}.selfLink)
+      {% endfor %}
+
+  - type: compute.v1.address
+    name: {{ env["deployment"] }}-api-lb-ip
+    properties:
+      region: {{ properties["region"] }}
+      addressType: EXTERNAL
+
+  - type: compute.v1.forwardingRule
+    name: {{ env["deployment"] }}-api-intlb
+    properties:
+      loadBalancingScheme: EXTERNAL
+      IPAddress: $(ref.{{ env["deployment"] }}-api-lb-ip.address)
+      IPProtocol: TCP
+      portRange: 6443
+      region: {{ properties["region"] }}
+      target: $(ref.{{ env["deployment"] }}-api-tpool.selfLink)

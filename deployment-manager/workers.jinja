@@ -1,0 +1,31 @@
+resources:
+  - type: compute.v1.instanceGroup
+    name: {{ env["deployment"] }}-workers-ig
+    properties:
+      region: {{ properties["region"] }}
+      zone: {{ properties["zone"] }}
+      network: $(ref.{{ env["deployment"] }}-network.selfLink)
+
+{% for k in range(1,properties["instances"]+1) %}
+  - type: compute.v1.instance
+    name: {{ env["deployment"] }}-worker-{{ k }}
+    properties:
+      zone: {{ properties["zone"] }}
+      machineType: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/zones/{{ properties["zone"] }}/machineTypes/{{ properties["machineType"] }}
+      networkInterfaces:
+        - network: $(ref.{{ env["deployment"] }}-network.selfLink)
+          subnetwork: $(ref.{{ env["deployment"] }}-subnet.selfLink)
+          accessConfigs:
+            - name: {{ env["deployment"] }}-worker-{{ k }}-eth0
+              type: ONE_TO_ONE_NAT
+      disks:
+        - deviceName: boot
+          type: PERSISTENT
+          boot: true
+          autoDelete: true
+          initializeParams:
+            diskName: {{ env["deployment"] }}-worker-{{ k }}-boot
+            diskType: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/zones/{{ properties["zone"] }}/diskTypes/pd-ssd
+            diskSizeGb: {{ properties["diskSizeGb"] }}
+            sourceImage: https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/ubuntu-1604-xenial-v20180405
+{% endfor %}

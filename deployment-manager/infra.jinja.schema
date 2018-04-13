@@ -1,0 +1,23 @@
+info:
+  title: Network infrastructure for Kubernetes via KET
+  author: James Walton, Apprenda
+  description: Generates network infrastructure for Kubernetes deployed via Kismatic
+
+required:
+  - region
+  - subnet_cidr
+  - local_cidr
+
+properties:
+  region:
+    description: Region for subnet(s)
+    type: string
+    default: us-east4
+  subnet_cidr:
+    description: IP CIDR to use for the subnet
+    type: string
+    default: 10.9.0.0/24
+  local_cidr:
+    description: IP CIDR to allow access from
+    type: string
+    default: 0.0.0.0/0
