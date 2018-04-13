@@ -1,36 +1,85 @@
-## Kubernetes on Azure via Kismatic Enterprise Toolkit
-The focus of this code is to deploy a minimal Kubernetes cluster into Microsoft Azure for testing and training purposes.
+## Kubernetes on Google Cloud Platform via Kismatic Enterprise Toolkit
+The focus of this code is to deploy a basic Kubernetes cluster into Google Cloud Platform for testing and training purposes.
 Upon successful completion, the following VM infrastructure will have been provisioned:
-  * Bastion node (public IP, restricted access to SSH)
-  * 1 k8s master node, with etcd co-located (public IP, restricted access to SSH and k8s API)
-  * 2 k8s worker nodes, 1 node configured with nginx ingress controller (private IP only)
+  * 1 k8s master node, with etcd co-located
+  * 1 k8s worker node
+  * 1 k8s ingress controller node
+
+All instances are configured with public IPs, however firewall rules will only allow SSH and kubeapi access from the CIDR block (`local_cidr`) defined in [config.yaml](deployment-manager/config.yaml), or the default value as set in [infra.jinja.schema](deployment-manager/infra.jinja.schema) if no `local_cidr` is provided.
+
+Additionally, the following support infrastructure will be provisioned:
+  * Custom network with a single subnet
+  * Firewall rules for SSH, kubeapi, and internal network traffic
+  * An instance group per component: masters, workers, ingress controllers
+  * External TCP load balancer for the Kubernetes API
 
 ### Prerequisites
-* Microsoft Azure account (https://azure.microsoft.com/en-us/free/)
-* Azure CLI 2.0 (https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
-* Terraform v0.11+ (https://www.terraform.io/downloads.html)
+* Google Cloud Platform account (https://console.cloud.google.com/freetrial)
+* Google Cloud SDK (https://cloud.google.com/sdk/)
 
-### Usage
-Create a customized `terraform/terraform.tfvars` file ([tfvars file reference](https://www.terraform.io/intro/getting-started/variables.html#from-a-file)), key configurations are:
+### Customization
+Customize [deployment-manager/config.yaml](deployment-manager/config.yaml) for your desired cluster setup. Some critical configurations are as seen below:
 
-| Key               | Description       |
-| ----------------- | ----------------- |
-| `local_ip_cidr`   | Your local machine IP address (x.x.x.x/32) or CIDR range to allow access to the bastion node and cluster |
-| `tenant_id`       | Your Azure account tenant ID (can be found via Azure CLI command `az account show`) |
-| `subscription_id` | An Azure subscription ID from the above account/tenant (`az account list`) |
-| `aadclient_id` / `aadclient_secret` | Active Directory application client ID and secret (AZ Portal > AAD > App registrations)|
+| Infra Key     | Description       |
+| ------------- | ----------------- |
+| `local_cidr`  | The source CIDR block to allow inbound access |
+| `subnet_cidr` | CIDR block allocation for the subnet |
+| `region`      | GCP region to execute deployment |
 
-Other settings can be configured such as VM sizes and the Azure region, as listed in `terraform/variables.tf`.
+The following properties are available for ingress, workers, and masters:
 
-Prepare and execute the cluster VM builds:
-  1. `make ssh-keypair`
-  1. `make plan-cluster-vms`
-  1. `make cluster-vms`
+| Common VM Key | Description       |
+| ------------- | ----------------- |
+| `region`      | GCP region to execute deployment, must match across all resources |
+| `zone`        | GCP regional zone to deploy VMs into |
+| `machineType` | GCP machine type for VMs |
+| `instances`   | Number of VMs to deploy |
+| `diskSizeGb`  | Size for the VM persistent boot disk |
 
-Once the build completes, the final step of running Kismatic must be run from the bastion node.
-  1. Use the ssh connection command from the Terraform output to login to the bastion node
-  1. `make validate-k8s-cluster`
-  1. `make k8s-cluster`
+Below is an example from `config.yaml`, where the region has been modified from the default for the resources:
+```
+resources:
+  - name: infra
+    type: infra.jinja
+    properties:
+      region: us-central1
+  - name: masters
+    type: masters.jinja
+    properties:
+      region: us-central1
+      zone: us-central1-b
+  - name: workers
+    type: workers.jinja
+    properties:
+      region: us-central1
+      zone: us-central1-b
+  - name: ingress
+    type: ingress.jinja
+    properties:
+      region: us-central1
+      zone: us-central1-b
+```
 
-When finished with the cluster, you may destroy all the resources that were provisioned. To do so, run the following from your local workstation:
-  1. `make destroy-cluster-vms`
+### Provision and Build a cluster
+1. Deploy the GCP template (sets up the infrastructure and VMs):
+  ```
+  make cluster-vms
+  ```
+
+2. Update the values in [kismatic/env.cfg](kismatic/env.cfg)
+  * Replace the GCE user and SSH key values
+  * Update the IP addresses with the private and public IPs for your provisioned VMs and load balancer.
+  * _Optional_: change the deployment name (will prefix all provisioned resource names)
+
+3. Once the deployment completes, setup and execute Kismatic Enterprise Toolkit:
+  ```
+  make kismatic
+  make prepare-kubernetes
+  make kubernetes
+  ```
+
+4. When finished with the cluster, you may destroy all the resources that were provisioned. To do so, run the following:
+  ```
+  make destroy-vms
+  make remove-kismatic
+  ```
