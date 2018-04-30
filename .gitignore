@@ -6,3 +6,4 @@ kismatic/kubectl
 kismatic/helm
 kismatic/provision
 kismatic/*.tar.gz
+kismatic/*-cluster.yaml

@@ -63,7 +63,7 @@ resources:
 ### Provision and Build a cluster
 1. Deploy the GCP template (sets up the infrastructure and VMs):
   ```
-  make cluster-vms
+  make create-vms
   ```
 
 2. Update the values in [kismatic/env.cfg](kismatic/env.cfg)
@@ -73,9 +73,9 @@ resources:
 
 3. Once the deployment completes, setup and execute Kismatic Enterprise Toolkit:
   ```
-  make kismatic
+  make install-kismatic
   make prepare-kubernetes
-  make kubernetes
+  make install-kubernetes
   ```
 
 4. When finished with the cluster, you may destroy all the resources that were provisioned. To do so, run the following:
