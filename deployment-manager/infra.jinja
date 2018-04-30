@@ -35,6 +35,7 @@ resources:
         - IPProtocol: udp
           ports: [0-65535]
         - IPProtocol: icmp
+        - IPProtocol: ipip
       sourceRanges:
         - {{ properties["subnet_cidr"] }}
 
