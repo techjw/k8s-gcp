@@ -134,11 +134,16 @@ master:
       component: "master"
 
 worker:
-  expected_count: 1
+  expected_count: 2
   nodes:
   - host: "%deploy_name%-worker-1"
     ip: "%worker1_pubip%"
     internalip: "%worker1_ip%"
+    labels:
+      component: "worker"
+  - host: "%deploy_name%-worker-2"
+    ip: "%worker2_pubip%"
+    internalip: "%worker2_ip%"
     labels:
       component: "worker"
 

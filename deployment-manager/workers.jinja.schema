@@ -24,7 +24,7 @@ properties:
   instances:
     description: Number of worker VMs
     type: integer
-    default: 1
+    default: 2
   diskSizeGb:
     description: Size of boot disk
     type: integer
