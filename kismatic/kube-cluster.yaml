@@ -119,25 +119,30 @@ etcd:
   expected_count: 1
   nodes:
   - host: "kube-master-1"
-    ip: "35.186.174.24"
+    ip: "35.188.252.154"
     internalip: "10.9.0.3"
 
 master:
   expected_count: 1
-  load_balanced_fqdn: "35.188.238.248"
-  load_balanced_short_name: "35.188.238.248"
+  load_balanced_fqdn: "35.194.81.66"
+  load_balanced_short_name: "35.194.81.66"
   nodes:
   - host: "kube-master-1"
-    ip: "35.186.174.24"
+    ip: "35.188.252.154"
     internalip: "10.9.0.3"
     labels:
       component: "master"
 
 worker:
-  expected_count: 1
+  expected_count: 2
   nodes:
   - host: "kube-worker-1"
-    ip: "35.188.251.51"
+    ip: "35.194.71.245"
+    internalip: "10.9.0.2"
+    labels:
+      component: "worker"
+  - host: "kube-worker-2"
+    ip: "35.194.84.154"
     internalip: "10.9.0.4"
     labels:
       component: "worker"
@@ -146,8 +151,8 @@ ingress:
   expected_count: 1
   nodes:
   - host: "kube-ingress-1"
-    ip: "35.188.250.116"
-    internalip: "10.9.0.2"
+    ip: "35.194.86.46"
+    internalip: "10.9.0.5"
     labels:
       component: "ingress"
 
