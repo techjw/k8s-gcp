@@ -7,6 +7,7 @@ required:
   - region
   - zone
   - machineType
+  - serviceAccount
 
 properties:
   region:
@@ -29,3 +30,6 @@ properties:
     description: Size of boot disk
     type: integer
     default: 10
+  serviceAccount:
+    description: Service Account for masters instances to enable cloud-provider integration
+    type: string
