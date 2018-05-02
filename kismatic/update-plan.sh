@@ -15,3 +15,7 @@ sed -e "s/%deploy_name%/${DEPLOY_NAME}/g;
   s/%ingress1_ip%/${INGRESS1_IP}/g;
   s/%ingress1_pubip%/${INGRESS1_PUBIP}/g" \
   cluster.yaml.tpl > ${DEPLOY_NAME}-cluster.yaml
+
+sed -e "s/%deploy_name%/${DEPLOY_NAME}/g;
+  s/%project_id%/${PROJECT_ID}/g" \
+  gce-cloud-provider.conf.tpl > ${DEPLOY_NAME}-gce.conf
