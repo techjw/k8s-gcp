@@ -28,6 +28,10 @@ resources:
             diskType: https://www.googleapis.com/compute/v1/projects/{{ env["project"] }}/zones/{{ properties["zone"] }}/diskTypes/pd-ssd
             diskSizeGb: {{ properties["diskSizeGb"] }}
             sourceImage: https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/ubuntu-1604-xenial-v20180405
+      serviceAccounts:
+        - email: {{ properties["serviceAccount"] }}
+          scopes:
+            - https://www.googleapis.com/auth/cloud-platform
       tags:
         items:
           - kube-ingress

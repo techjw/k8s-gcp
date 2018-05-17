@@ -9,7 +9,13 @@ resources:
     type: infra.jinja
   - name: masters
     type: masters.jinja
+    properties:
+      serviceAccount: kube-service-account@projectid.iam.gserviceaccount.com
   - name: workers
     type: workers.jinja
+    properties:
+      serviceAccount: kube-service-account@projectid.iam.gserviceaccount.com
   - name: ingress
     type: ingress.jinja
+    properties:
+      serviceAccount: kube-service-account@projectid.iam.gserviceaccount.com

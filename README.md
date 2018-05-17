@@ -2,7 +2,7 @@
 The focus of this code is to deploy a basic Kubernetes cluster into Google Cloud Platform for testing and training purposes.
 Upon successful completion, the following VM infrastructure will have been provisioned:
   * 1 k8s master node, with etcd co-located
-  * 1 k8s worker node
+  * 2 k8s worker node
   * 1 k8s ingress controller node
 
 All instances are configured with public IPs, however firewall rules will only allow SSH and kubeapi access from the CIDR block (`local_cidr`) defined in [config.yaml](deployment-manager/config.yaml), or the default value as set in [infra.jinja.schema](deployment-manager/infra.jinja.schema) if no `local_cidr` is provided.
@@ -25,6 +25,7 @@ Customize [deployment-manager/config.yaml](deployment-manager/config.yaml) for y
 | `local_cidr`  | The source CIDR block to allow inbound access |
 | `subnet_cidr` | CIDR block allocation for the subnet |
 | `region`      | GCP region to execute deployment |
+| `serviceAccount` | IAM service account to use with the GCE cloud provider plugin |
 
 The following properties are available for ingress, workers, and masters:
 
