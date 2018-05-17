@@ -40,10 +40,8 @@ cluster:
 
     # Options: aws|azure|cloudstack|fake|gce|mesos|openstack|ovirt|photon|rackspace|vsphere
     # Leave config empty if provider does not require a path to a config file.
-    provider: ""
-    config: ""
-    # provider: "gce"
-    # config: "gce-cloud-provider.conf"
+    provider: "gce"
+    config: "%deploy_name%-gce.conf"
 
 docker:
   disable: false
