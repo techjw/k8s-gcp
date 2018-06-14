@@ -40,13 +40,13 @@ resources:
         - {{ properties["subnet_cidr"] }}
 
   - type: compute.v1.firewall
-    name: {{ env["deployment"] }}-network-allow-kubeapi
+    name: {{ env["deployment"] }}-network-allow-kubeports
     properties:
       network: $(ref.{{ env["deployment"] }}-network.selfLink)
       direction: INGRESS
       priority: 1000
       allowed:
         - IPProtocol: tcp
-          ports: [6443]
+          ports: [6443, 443]
       sourceRanges:
         - {{ properties["local_cidr"] }}

@@ -22,6 +22,10 @@ properties:
     description: VM machine type
     type: string
     default: n1-standard-2
+  sourceImage:
+    description: Google URL for source boot disk (OS) image
+    type: string
+    default: projects/debian-cloud/global/images/family/ubuntu-1604-lts
   instances:
     description: Number of worker VMs
     type: integer
